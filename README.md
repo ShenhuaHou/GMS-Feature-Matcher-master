@@ -6,9 +6,9 @@
 - No GPU
 - Resize to 480
 ```
-- BFMatcher time speed: 260.004 ms
+- BFMatcher time spend: 260.004 ms
 - Get total 619 matches.
-- All time speed: 1320.17 ms
+- All time spend: 1320.17 ms
 ```
 
 
