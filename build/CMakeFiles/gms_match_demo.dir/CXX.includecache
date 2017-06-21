@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/Header.h
+opencv2/opencv.hpp
+-
+vector
+-
+iostream
+-
+ctime
+-
+opencv2/cudafeatures2d.hpp
+-
+
+../include/gms_matcher.h
+Header.h
+../include/Header.h
+
+/home/shenhua/Documents/GMS-Feature-Matcher-master/src/demo.cpp
+Header.h
+/home/shenhua/Documents/GMS-Feature-Matcher-master/src/Header.h
+gms_matcher.h
+/home/shenhua/Documents/GMS-Feature-Matcher-master/src/gms_matcher.h
+chrono
+-
+iomanip
+-
+

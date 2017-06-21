@@ -10,15 +10,13 @@
 void GmsMatch(Mat &img1, Mat &img2);
 
 void runImagePair(){
-	Mat img1 = imread("../data/nn_left.jpg");
-	Mat img2 = imread("../data/nn_right.jpg");
+	Mat img1 = imread("../data/72.jpg");
+	Mat img2 = imread("../data/326.jpg");
 
-	imresize(img1, 480);
-	imresize(img2, 480);
+	// imresize(img1, 480);
+	// imresize(img2, 480);
 
-	
 	GmsMatch(img1, img2);
-	
 }
 
 
@@ -40,12 +38,13 @@ void GmsMatch(Mat &img1, Mat &img2){
 	Mat d1, d2;
 	vector<DMatch> matches_all, matches_gms;
 
-	Ptr<ORB> orb = ORB::create(10000);
-	orb->setFastThreshold(0);
-	orb->detectAndCompute(img1, Mat(), kp1, d1);
-	orb->detectAndCompute(img2, Mat(), kp2, d2);
+	cv::ORB orb(1000);
+	// orb->setFastThreshold(0);
+	orb.detect(img1, kp1);
+	orb.detect(img2, kp2);
 
-	auto time_start = std::chrono::system_clock::now();
+	orb.compute(img1, kp1, d1);
+	orb.compute(img2, kp2, d2);
 
 #ifdef USE_GPU
 	GpuMat gd1(d1), gd2(d2);
@@ -55,16 +54,17 @@ void GmsMatch(Mat &img1, Mat &img2){
 	BFMatcher matcher(NORM_HAMMING);
 	matcher.match(d1, d2, matches_all);
 #endif
-
-	auto time_intr= std::chrono::system_clock::now();
-	std::cout << "BFMatcher time: " << std::setprecision(6) << std::chrono::duration<double, std::milli>(time_intr - time_start).count() << " ms" << std::endl;
+	auto time_start = std::chrono::system_clock::now();
 
 	// GMS filter
 	int num_inliers = 0;
 	std::vector<bool> vbInliers;
 	gms_matcher gms(kp1,img1.size(), kp2,img2.size(), matches_all);
-	num_inliers = gms.GetInlierMask(vbInliers, false, true);
-
+	num_inliers = gms.GetInlierMask(vbInliers, false, false);
+	
+	auto time_intr= std::chrono::system_clock::now();
+	std::cout << "gms time: " << std::setprecision(6) << std::chrono::duration<double, std::milli>(time_intr - time_start).count() << " ms" << std::endl;
+	
 	cout << "Get total " << num_inliers << " matches." << endl;
 
 	// draw matches
@@ -75,8 +75,6 @@ void GmsMatch(Mat &img1, Mat &img2){
 			matches_gms.push_back(matches_all[i]);
 		}
 	}
-	auto time_end = std::chrono::system_clock::now();
-	std::cout << "All time: " << std::setprecision(6) << std::chrono::duration<double, std::milli>(time_end - time_start).count() << " ms" << std::endl;
 
 	Mat show = DrawInlier(img1, img2, kp1, kp2, matches_gms, 1);
 	imshow("show", show);
